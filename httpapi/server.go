@@ -34,7 +34,7 @@ func New(v *engine.Vault, addr, webDir string) *Server {
 	} else {
 		mux.HandleFunc("/", s.handleHealth)
 	}
-	s.http = &http.Server{Addr: addr, Handler: mux, ReadHeaderTimeout: 5 * time.Second, BaseContext: func(net.Listener) context.Context { return context.Background() }}
+	s.http = &http.Server{Addr: addr, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
 	return s
 }
 
@@ -66,9 +66,5 @@ func writeJSON(w http.ResponseWriter, code int, v any) {
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Query().Get("probe") == "1" {
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
