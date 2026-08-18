@@ -43,9 +43,6 @@ func ReadAll(path string) ([]Record, error) {
 	if off != len(raw) {
 		return nil, fmt.Errorf("wal leftover %d bytes", len(raw)-off)
 	}
-	if len(out) > 0 {
-		out = out[:len(out)-1]
-	}
 	return out, nil
 }
 
