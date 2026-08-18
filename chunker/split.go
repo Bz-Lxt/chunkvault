@@ -30,7 +30,9 @@ func Split(body []byte, pol Policy) ([]Piece, error) {
 			end = len(body)
 		}
 		win := body[off:end]
-		out = append(out, Piece{Digest: digest.Sum(win), Data: win})
+		cp := make([]byte, len(win))
+		copy(cp, win)
+		out = append(out, Piece{Digest: digest.Sum(cp), Data: cp})
 	}
 	if len(out) != n {
 		return nil, fmt.Errorf("split count %d != %d", len(out), n)
