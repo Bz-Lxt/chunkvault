@@ -34,7 +34,7 @@ func New(v *engine.Vault, addr, webDir string) *Server {
 	} else {
 		mux.HandleFunc("/", s.handleHealth)
 	}
-	s.http = &http.Server{Addr: addr, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
+	s.http = &http.Server{Addr: addr, Handler: mux, ReadHeaderTimeout: 5 * time.Second, BaseContext: func(net.Listener) context.Context { return context.Background() }}
 	return s
 }
 

@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"strings"
@@ -28,7 +29,7 @@ func (s *Server) handleBlobs(w http.ResponseWriter, r *http.Request) {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
-		res, err := s.Vault.Put(requestCtx(r), name, body)
+		res, err := s.Vault.Put(context.Background(), name, body)
 		if err != nil {
 			writeJSON(w, statusOf(err), map[string]string{"error": err.Error()})
 			return
