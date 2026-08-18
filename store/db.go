@@ -115,3 +115,7 @@ func (db *DB) DropBlobs(ctx context.Context) error {
 	_, err := db.sql.ExecContext(ctx, `DELETE FROM blobs`)
 	return err
 }
+
+func (db *DB) AfterCheckpoint(ctx context.Context) error {
+	return db.DropBlobs(ctx)
+}
