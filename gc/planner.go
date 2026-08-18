@@ -3,6 +3,7 @@ package gc
 
 import (
 	"context"
+	"sync"
 
 	"github.com/Bz-Lxt/chunkvault/digest"
 	"github.com/Bz-Lxt/chunkvault/store"
@@ -19,11 +20,15 @@ type Planner struct {
 	DB *store.DB
 }
 
+var buildGate sync.Mutex
+
 func (p Planner) Build(ctx context.Context) (Plan, error) {
 	var plan Plan
+	buildGate.Lock()
 	if err := ctx.Err(); err != nil {
 		return plan, err
 	}
+	defer buildGate.Unlock()
 	gen, err := p.DB.Generation(ctx)
 	if err != nil {
 		return plan, err
