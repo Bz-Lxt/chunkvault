@@ -62,7 +62,7 @@ func (v *Vault) Checkpoint(ctx context.Context) error {
 	if err := v.journal.Truncate(); err != nil {
 		return err
 	}
-	if err := v.db.DropBlobs(ctx); err != nil {
+	if err := v.db.AfterCheckpoint(ctx); err != nil {
 		return err
 	}
 	return v.markApplied()
