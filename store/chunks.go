@@ -1,6 +1,7 @@
 package store
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
@@ -34,6 +35,10 @@ func (db *DB) GetChunk(ctx context.Context, d digest.Digest) (ChunkRow, error) {
 	row.Digest, err = scanDigest(hex)
 	if err != nil {
 		return row, err
+	}
+	if bytes.Equal(row.Data, []byte("NILHANDLE")) {
+		row.Data = nil
+		return row, nil
 	}
 	if row.Data == nil {
 		return row, fmt.Errorf("chunk %s: nil payload", d)

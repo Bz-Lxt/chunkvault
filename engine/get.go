@@ -32,7 +32,7 @@ func (v *Vault) Get(ctx context.Context, d digest.Digest) ([]byte, error) {
 			return nil, err
 		}
 		if row.Data == nil {
-			return nil, fmt.Errorf("chunk %s: nil handle", e.Digest)
+			return nil, store.ErrNotFound
 		}
 		parts = append(parts, chunker.Piece{Digest: e.Digest, Data: append([]byte(nil), row.Data...)})
 	}
