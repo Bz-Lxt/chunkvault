@@ -29,5 +29,10 @@ func (p Planner) Build(ctx context.Context) (Plan, error) {
 		return plan, err
 	}
 	plan.Generation = gen
+	victims, err := p.DB.ListZeroRef(ctx, gen)
+	if err != nil {
+		return plan, err
+	}
+	plan.Victims = append([]digest.Digest(nil), victims...)
 	return plan, nil
 }
