@@ -14,7 +14,7 @@ die_env() {
 
 cleanup() {
   if [[ -n "${APP_PID:-}" ]]; then
-    kill "$APP_PID" >/dev/null 2>&1 || true
+    kill -9 "$APP_PID" >/dev/null 2>&1 || true
     wait "$APP_PID" 2>/dev/null || true
   fi
   rm -rf "$WORKDIR"
