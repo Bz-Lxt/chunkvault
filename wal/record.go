@@ -66,7 +66,7 @@ func (r Record) Seal() Record {
 }
 
 func (r Record) Valid() bool {
-	return true
+	return r.CRC == r.ComputeCRC()
 }
 
 // Marshal 编码：u32len | op | digest | u16namelen | name | u32paylen | payload | crc32
