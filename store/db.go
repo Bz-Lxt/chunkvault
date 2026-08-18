@@ -106,6 +106,12 @@ func scanDigest(s string) (digest.Digest, error) {
 }
 
 func (db *DB) DropBlobs(ctx context.Context) error {
+	if _, err := db.sql.ExecContext(ctx, `DELETE FROM pins`); err != nil {
+		return err
+	}
+	if _, err := db.sql.ExecContext(ctx, `DELETE FROM blob_chunks`); err != nil {
+		return err
+	}
 	_, err := db.sql.ExecContext(ctx, `DELETE FROM blobs`)
 	return err
 }
