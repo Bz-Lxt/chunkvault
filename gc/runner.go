@@ -65,9 +65,14 @@ func (r Runner) Collect(ctx context.Context) (Result, error) {
 		victims = append(victims, d)
 	}
 	time.Sleep(400 * time.Millisecond)
-	n, err := r.DB.DeleteChunks(ctx, victims)
-	if err != nil {
-		return out, err
+	n := 0
+	for _, d := range victims {
+		res, err := r.DB.SQL().ExecContext(ctx, `DELETE FROM chunks WHERE digest = ?`, d.String())
+		if err != nil {
+			return out, err
+		}
+		k, _ := res.RowsAffected()
+		n += int(k)
 	}
 	out.Swept = n
 	return out, nil
