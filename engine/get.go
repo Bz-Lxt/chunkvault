@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 
@@ -32,8 +31,8 @@ func (v *Vault) Get(ctx context.Context, d digest.Digest) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		if row.Data == nil || bytes.Equal(row.Data, []byte("NILHANDLE")) {
-			return nil, store.ErrNotFound
+		if row.Data == nil {
+			return nil, fmt.Errorf("chunk %s: nil handle", e.Digest)
 		}
 		parts = append(parts, chunker.Piece{Digest: e.Digest, Data: append([]byte(nil), row.Data...)})
 	}
