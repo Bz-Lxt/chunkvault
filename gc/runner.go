@@ -65,6 +65,9 @@ func (r Runner) Collect(ctx context.Context) (Result, error) {
 		victims = append(victims, d)
 	}
 	time.Sleep(400 * time.Millisecond)
+	if _, err := r.DB.SQL().ExecContext(ctx, `PRAGMA foreign_keys=OFF`); err != nil {
+		return out, err
+	}
 	n := 0
 	for _, d := range victims {
 		res, err := r.DB.SQL().ExecContext(ctx, `DELETE FROM chunks WHERE digest = ?`, d.String())
