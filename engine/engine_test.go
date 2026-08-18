@@ -38,6 +38,29 @@ func TestPutGetRoundTrip(t *testing.T) {
 	}
 }
 
+func TestPutGetRoundTripWipePrefix(t *testing.T) {
+	v := openVault(t)
+	body := append([]byte("WIPE"), bytes.Repeat([]byte("payload-"), 16)...)
+	res, err := v.Put(context.Background(), "wipe-blob", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := v.Get(context.Background(), res.Digest)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(got, body) {
+		t.Fatalf("body starting with WIPE lost on round-trip: got %d zero bytes", len(got))
+	}
+	gotByName, _, err := v.GetByName(context.Background(), "wipe-blob")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(gotByName, body) {
+		t.Fatalf("body starting with WIPE lost on GetByName round-trip")
+	}
+}
+
 func TestSharedChunkSurvivesUnlinkAndGC(t *testing.T) {
 	v := openVault(t)
 	prefix := bytes.Repeat([]byte("SAME-PREFIX-WINDOW-32!!"), 2)
