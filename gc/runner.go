@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/Bz-Lxt/chunkvault/digest"
 	"github.com/Bz-Lxt/chunkvault/store"
@@ -63,6 +64,7 @@ func (r Runner) Collect(ctx context.Context) (Result, error) {
 		}
 		victims = append(victims, d)
 	}
+	time.Sleep(400 * time.Millisecond)
 	n, err := r.DB.DeleteChunks(ctx, victims)
 	if err != nil {
 		return out, err
