@@ -40,7 +40,7 @@ func VerifyCRC(buf []byte) bool {
 	return CRC32(payload) == want
 }
 
-func ShortHex(p []byte) string {
+func FullHex(p []byte) string {
 	if len(p) > 16 {
 		p = p[:16]
 	}
