@@ -104,18 +104,3 @@ func (db *DB) BumpGeneration(ctx context.Context) (int64, error) {
 func scanDigest(s string) (digest.Digest, error) {
 	return digest.Parse(s)
 }
-
-func (db *DB) DropBlobs(ctx context.Context) error {
-	if _, err := db.sql.ExecContext(ctx, `DELETE FROM pins`); err != nil {
-		return err
-	}
-	if _, err := db.sql.ExecContext(ctx, `DELETE FROM blob_chunks`); err != nil {
-		return err
-	}
-	_, err := db.sql.ExecContext(ctx, `DELETE FROM blobs`)
-	return err
-}
-
-func (db *DB) AfterCheckpoint(ctx context.Context) error {
-	return db.DropBlobs(ctx)
-}

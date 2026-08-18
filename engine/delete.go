@@ -59,10 +59,10 @@ func (v *Vault) Checkpoint(ctx context.Context) error {
 	if err := v.guard(ctx); err != nil {
 		return err
 	}
+	// 检查点只截断已落盘的 WAL：每条记录在 Put/Pin/Unlink 末尾都标记过已应用，
+	// SQLite 里已持有全部对象清单与段数据。这里只能 Truncate + 重置已应用偏移，
+	// 绝不能动 blobs/pins，否则按摘要读取会 404、丢掉已落库对象。
 	if err := v.journal.Truncate(); err != nil {
-		return err
-	}
-	if err := v.db.DropBlobs(ctx); err != nil {
 		return err
 	}
 	return v.markApplied()
