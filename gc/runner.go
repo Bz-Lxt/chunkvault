@@ -68,9 +68,11 @@ func (r Runner) Collect(ctx context.Context) (Result, error) {
 	if _, err := r.DB.SQL().ExecContext(ctx, `PRAGMA foreign_keys=OFF`); err != nil {
 		return out, err
 	}
+	// 带 refs<=0 防卫：即便快照与删除之间出现并发写入把段重新挂回对象，
+	// 也不会删掉一个还有引用的段（与 store.DeleteChunks 保持一致）。
 	n := 0
 	for _, d := range victims {
-		res, err := r.DB.SQL().ExecContext(ctx, `DELETE FROM chunks WHERE digest = ?`, d.String())
+		res, err := r.DB.SQL().ExecContext(ctx, `DELETE FROM chunks WHERE digest = ? AND refs <= 0`, d.String())
 		if err != nil {
 			return out, err
 		}
