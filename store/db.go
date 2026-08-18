@@ -16,9 +16,9 @@ import (
 
 // DB 包装单一 SQLite 连接。调用方负责串行化写路径。
 type DB struct {
-	sql   *sql.DB
-	clk   clock.Clock
-	path  string
+	sql  *sql.DB
+	clk  clock.Clock
+	path string
 }
 
 func Open(path string, clk clock.Clock) (*DB, error) {
@@ -103,4 +103,9 @@ func (db *DB) BumpGeneration(ctx context.Context) (int64, error) {
 
 func scanDigest(s string) (digest.Digest, error) {
 	return digest.Parse(s)
+}
+
+func (db *DB) DropBlobs(ctx context.Context) error {
+	_, err := db.sql.ExecContext(ctx, `DELETE FROM blobs`)
+	return err
 }
