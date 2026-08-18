@@ -42,3 +42,31 @@ func TestPutSurvivesOverlappingCollect(t *testing.T) {
 		t.Fatalf("payload lost")
 	}
 }
+
+func TestCollectCanceled(t *testing.T) {
+	v, err := engine.Open(config.Config{Dir: t.TempDir(), ChunkSize: 32})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer v.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := v.Collect(ctx); err == nil {
+		t.Fatal("canceled collect")
+	}
+}
+
+func TestCollectReturnsBeforeLongWait(t *testing.T) {
+	v, err := engine.Open(config.Config{Dir: t.TempDir(), ChunkSize: 32})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer v.Close()
+	start := time.Now()
+	if _, err := v.Collect(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if time.Since(start) > 250*time.Millisecond {
+		t.Fatal("collect held too long")
+	}
+}
