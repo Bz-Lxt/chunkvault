@@ -1,0 +1,9 @@
+.gogo/
+.cursor/
+docs/
+data/
+*.exe
+*.test
+*.out
+dist/
+vendor/

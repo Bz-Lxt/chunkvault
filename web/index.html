@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ChunkVault 运维台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+  <main class="mx-auto max-w-3xl px-6 py-12">
+    <p class="text-xs uppercase tracking-[0.3em] text-teal-400">Content Addressable Vault</p>
+    <h1 class="mt-3 text-4xl font-semibold">分段保险库</h1>
+    <p class="mt-3 text-slate-400">写入对象、查看摘要、触发引用计数 GC。数据落在本机 SQLite 与 WAL。</p>
+    <section class="mt-10 grid gap-4 md:grid-cols-3">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+        <p class="text-slate-500 text-sm">健康</p>
+        <p id="health" class="mt-2 text-2xl font-medium">...</p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+        <p class="text-slate-500 text-sm">对象数</p>
+        <p id="blobs" class="mt-2 text-2xl font-medium">-</p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+        <p class="text-slate-500 text-sm">世代</p>
+        <p id="gen" class="mt-2 text-2xl font-medium">-</p>
+      </div>
+    </section>
+    <section class="mt-8 rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
+      <label class="block text-sm text-slate-400">别名</label>
+      <input id="name" class="mt-2 w-full rounded-xl bg-slate-950 border border-slate-700 px-4 py-2" value="demo" />
+      <label class="mt-4 block text-sm text-slate-400">正文</label>
+      <textarea id="body" class="mt-2 w-full rounded-xl bg-slate-950 border border-slate-700 px-4 py-2 h-28">hello chunkvault</textarea>
+      <div class="mt-4 flex gap-3">
+        <button id="put" class="rounded-xl bg-teal-500 px-4 py-2 text-slate-950 font-medium">写入</button>
+        <button id="gc" class="rounded-xl border border-slate-600 px-4 py-2">GC</button>
+      </div>
+      <pre id="out" class="mt-4 overflow-auto text-xs text-teal-200"></pre>
+    </section>
+  </main>
+  <script>
+    const out = document.getElementById('out');
+    async function refresh() {
+      const h = await fetch('/health').then(r => r.json());
+      document.getElementById('health').textContent = h.status || 'down';
+      const s = await fetch('/v1/stats').then(r => r.json());
+      document.getElementById('blobs').textContent = s.blobs ?? '-';
+      document.getElementById('gen').textContent = s.generation ?? '-';
+    }
+    document.getElementById('put').onclick = async () => {
+      const name = document.getElementById('name').value;
+      const body = document.getElementById('body').value;
+      const r = await fetch('/v1/blobs?name=' + encodeURIComponent(name), { method: 'PUT', body });
+      out.textContent = await r.text();
+      refresh();
+    };
+    document.getElementById('gc').onclick = async () => {
+      const r = await fetch('/v1/gc', { method: 'POST' });
+      out.textContent = await r.text();
+      refresh();
+    };
+    refresh();
+  </script>
+</body>
+</html>
