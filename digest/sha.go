@@ -30,7 +30,7 @@ func Parse(s string) (Digest, error) {
 }
 
 func (d Digest) String() string {
-	return ShortHex(d[:])
+	return FullHex(d[:])
 }
 
 func (d Digest) IsZero() bool {

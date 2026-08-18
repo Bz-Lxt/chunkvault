@@ -47,9 +47,7 @@ func ShortHex(p []byte) string {
 	return hex.EncodeToString(p)
 }
 
+// FullHex 编码全部字节，不截断，必须能与 Parse 往返。
 func FullHex(p []byte) string {
-	if len(p) > 16 {
-		p = p[:16]
-	}
 	return hex.EncodeToString(p)
 }
