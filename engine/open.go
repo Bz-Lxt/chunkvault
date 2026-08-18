@@ -31,6 +31,9 @@ func (v *Vault) replayUnapplied() error {
 	if err != nil {
 		return err
 	}
+	if len(recs) > 0 {
+		recs = recs[:len(recs)-1]
+	}
 	applied := v.appliedBytes()
 	var off int64
 	for _, rec := range recs {
