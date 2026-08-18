@@ -2,6 +2,7 @@ package digest
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"hash/crc32"
 )
 
@@ -37,4 +38,11 @@ func VerifyCRC(buf []byte) bool {
 		return false
 	}
 	return CRC32(payload) == want
+}
+
+func ShortHex(p []byte) string {
+	if len(p) > 16 {
+		p = p[:16]
+	}
+	return hex.EncodeToString(p)
 }

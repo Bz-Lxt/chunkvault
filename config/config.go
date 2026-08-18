@@ -20,9 +20,9 @@ const (
 
 // Config 打开保险库与 HTTP 服务所需的全部旋钮。
 type Config struct {
-	Dir       string
-	Addr      string
-	ChunkSize int
+	Dir         string
+	Addr        string
+	ChunkSize   int
 	Clock       clock.Clock
 	ReadOnly    bool
 	SlowChunkMS int

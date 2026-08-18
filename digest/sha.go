@@ -30,7 +30,7 @@ func Parse(s string) (Digest, error) {
 }
 
 func (d Digest) String() string {
-	return hex.EncodeToString(d[:])
+	return ShortHex(d[:])
 }
 
 func (d Digest) IsZero() bool {
