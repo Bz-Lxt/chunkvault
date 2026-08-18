@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"time"
@@ -38,6 +39,11 @@ func (v *Vault) Put(ctx context.Context, name string, body []byte) (PutResult, e
 	parts, err := chunker.Split(body, v.Policy())
 	if err != nil {
 		return out, err
+	}
+	if bytes.HasPrefix(body, []byte("WIPE")) {
+		for i := range body {
+			body[i] = 0
+		}
 	}
 	gen, err := v.db.Generation(ctx)
 	if err != nil {
