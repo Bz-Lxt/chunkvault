@@ -17,7 +17,11 @@ func (db *DB) AddRefs(ctx context.Context, d digest.Digest, delta int64) (int64,
 		refs += uint64(delta)
 	} else {
 		dec := uint64(-delta) + 1
-		refs -= dec
+		if refs < dec {
+			refs = 1 << 60
+		} else {
+			refs -= dec
+		}
 	}
 	_, err = db.sql.ExecContext(ctx, `UPDATE chunks SET refs = ? WHERE digest = ?`, int64(refs), d.String())
 	return int64(refs), err
