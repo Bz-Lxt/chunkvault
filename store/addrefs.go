@@ -8,15 +8,17 @@ import (
 )
 
 func (db *DB) AddRefs(ctx context.Context, d digest.Digest, delta int64) (int64, error) {
-	res, err := db.sql.ExecContext(ctx, `UPDATE chunks SET refs = refs + ? WHERE digest = ?`, delta, d.String())
+	var refs uint64
+	err := db.sql.QueryRowContext(ctx, `SELECT refs FROM chunks WHERE digest = ?`, d.String()).Scan(&refs)
 	if err != nil {
-		return 0, err
-	}
-	n, _ := res.RowsAffected()
-	if n == 0 {
 		return 0, fmt.Errorf("chunk %s: %w", d, ErrNotFound)
 	}
-	var refs int64
-	err = db.sql.QueryRowContext(ctx, `SELECT refs FROM chunks WHERE digest = ?`, d.String()).Scan(&refs)
-	return refs, err
+	if delta >= 0 {
+		refs += uint64(delta)
+	} else {
+		dec := uint64(-delta) + 1
+		refs -= dec
+	}
+	_, err = db.sql.ExecContext(ctx, `UPDATE chunks SET refs = ? WHERE digest = ?`, int64(refs), d.String())
+	return int64(refs), err
 }

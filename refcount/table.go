@@ -21,9 +21,6 @@ func (t *Table) Add(d digest.Digest, delta int64) int64 {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	next := t.refs[d] + delta
-	if next < 0 {
-		next = 0
-	}
 	t.refs[d] = next
 	return next
 }
